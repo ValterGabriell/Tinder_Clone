@@ -1,75 +1,94 @@
 package com.example.tinder
 
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
+import com.example.tinder.Adapter.CardStackAdapter
 import com.example.tinder.Photo.PhotosItem
+import com.example.tinder.Repository.Repository
 import com.example.tinder.Users.UsersItem
 import com.example.tinder.databinding.ActivityMainBinding
-import com.yuyakaido.android.cardstackview.CardStackLayoutManager
-import com.yuyakaido.android.cardstackview.CardStackListener
-import com.yuyakaido.android.cardstackview.CardStackView
-import com.yuyakaido.android.cardstackview.Direction
+import com.yuyakaido.android.cardstackview.*
 
 class MainActivity : AppCompatActivity() {
 
     private val listUser = MutableLiveData<List<UsersItem>>()
     private val listPhoto = MutableLiveData<List<PhotosItem>>()
-    private lateinit var binding : ActivityMainBinding
+    private val repository = Repository()
+
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val repository = Repository()
-        repository.getUsers(listUser)
-        repository.getPhotos(listPhoto)
+        repository.apply {
+            this.getPhotos(listPhoto)
+            this.getUsers(listUser)
+        }
 
-        val cardStackView = findViewById<CardStackView>(R.id.card_stack_view)
-        cardStackView.layoutManager = CardStackLayoutManager(this, object : CardStackListener {
+        binding.cardStackView.layoutManager = configureCardStackManager()
+        observeDataFromRepository(binding.cardStackView)
+        rewindUser()
+
+
+    }
+
+
+    private fun rewindUser() {
+        binding.btnRewind.setOnClickListener {
+            binding.cardStackView.rewind()
+        }
+    }
+
+    private fun configureCardStackManager(): CardStackLayoutManager {
+        val cardStackLayoutManager = CardStackLayoutManager(this, object : CardStackListener {
             override fun onCardDragging(direction: Direction?, ratio: Float) {
-                Log.i("TAG", "Drag")
+
             }
 
             override fun onCardSwiped(direction: Direction?) {
-                Log.i("TAG", "Swipe")
+                Toast.makeText(this@MainActivity, "onCardSwiped", Toast.LENGTH_SHORT).show()
             }
 
             override fun onCardRewound() {
-                Log.i("TAG", "Rewound")
+                Toast.makeText(this@MainActivity, "onCardRewound", Toast.LENGTH_SHORT).show()
             }
 
             override fun onCardCanceled() {
-                Log.i("TAG", "Cancel")
+                Toast.makeText(this@MainActivity, "onCardCanceled", Toast.LENGTH_SHORT).show()
             }
 
             override fun onCardAppeared(view: View?, position: Int) {
-                Log.i("TAG", "Appear")
+                Toast.makeText(this@MainActivity, "onCardAppeared", Toast.LENGTH_SHORT).show()
             }
 
             override fun onCardDisappeared(view: View?, position: Int) {
-                Log.i("TAG", "Disappear")
+                Toast.makeText(this@MainActivity, "onCardDisappeared", Toast.LENGTH_SHORT).show()
             }
         })
 
+        cardStackLayoutManager.apply {
+            this.setVisibleCount(2)
+            this.setStackFrom(StackFrom.Left)
+            this.setMaxDegree(20.0f)
+            this.setSwipeableMethod(SwipeableMethod.AutomaticAndManual)
+        }
+
+        return cardStackLayoutManager
+    }
 
 
-        listUser.observe(this) { users->
-            listPhoto.observe(this){photos ->
+
+    private fun observeDataFromRepository(cardStackView: CardStackView) {
+        listUser.observe(this) { users ->
+            listPhoto.observe(this) { photos ->
                 cardStackView.adapter = CardStackAdapter(users, photos)
             }
         }
-
-        binding.btnRewind.setOnClickListener {
-            cardStackView.rewind()
-        }
-
-
-
     }
 
 

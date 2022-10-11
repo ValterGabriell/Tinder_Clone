@@ -1,4 +1,4 @@
-package com.example.tinder
+package com.example.tinder.Adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,8 +6,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tinder.CardStackAdapter.ViewHolder
+import com.example.tinder.Adapter.CardStackAdapter.ViewHolder
 import com.example.tinder.Photo.PhotosItem
+import com.example.tinder.R
 import com.example.tinder.Users.UsersItem
 import com.squareup.picasso.Picasso
 

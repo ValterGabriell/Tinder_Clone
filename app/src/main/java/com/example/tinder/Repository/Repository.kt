@@ -1,17 +1,18 @@
-package com.example.tinder
+package com.example.tinder.Repository
 
 import android.util.Log
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import com.example.tinder.Users.UsersItem
 import com.example.tinder.Network.Retrofit
 import com.example.tinder.Network.UsersService
 import com.example.tinder.Photo.PhotosItem
+import com.example.tinder.Users.UsersItem
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class Repository {
-    fun getUsers(listUser:MutableLiveData<List<UsersItem>>) {
+    fun getUsers(listUser: MutableLiveData<List<UsersItem>>) {
         val service = Retrofit.retrofit.create(UsersService::class.java)
         service.getUsers().enqueue(object : Callback<List<UsersItem>> {
             override fun onResponse(
@@ -29,7 +30,7 @@ class Repository {
     }
 
 
-    fun getPhotos(listPhoto:MutableLiveData<List<PhotosItem>>) {
+    fun getPhotos(listPhoto: MutableLiveData<List<PhotosItem>>) {
         val service = Retrofit.retrofit.create(UsersService::class.java)
         service.getPhotos().enqueue(object : Callback<List<PhotosItem>> {
             override fun onResponse(
@@ -44,6 +45,17 @@ class Repository {
             }
 
         })
+    }
+
+
+    fun checkIfCurrentUserIdBelongsToLikedUserIds(context: LifecycleOwner) {
+        val listUser = MutableLiveData<List<UsersItem>>()
+        getUsers(listUser)
+        listUser.observe(context) { userList ->
+            userList.forEach {
+
+            }
+        }
     }
 
 
